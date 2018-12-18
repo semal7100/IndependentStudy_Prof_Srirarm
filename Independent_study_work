@@ -1,0 +1,93 @@
+The work done:
+
+I have analysed Java code using three sources:
+Javaparser in Java
+Java Lang in python
+Plyj in python
+
+All of these parsers tend to break down the java code in AST.
+
+Java lang and Plyj are similar and tend to perform similar Tasks. Java Lang is preferable for JAVA 8 or later. 
+
+Part A: PLYJ
+
+Plyj is based on the ply(python-lex-Yacc) framework. They are used to parse as well as create compilation units for it.
+Using this one can inspect the source code and analyse the components in the units.
+
+Example : Consider the most basic hello world in java
+When this is run through this we get,
+tree = parser.parse_file(('helloworld.java'))
+print(tree)
+
+CompilationUnit(package_declaration=None, import_declarations=[], type_declarations=[ClassDeclaration(name='helloworld', body=[MethodDeclaration(name='main', modifiers=['public', 'static'], type_parameters=[], parameters=[FormalParameter(variable=Variable(name='args', dimensions=0), type=Type(name=Name(value='String'), type_arguments=[], enclosed_in=None, dimensions=1), modifiers=[], vararg=False)], return_type='void', body=[ExpressionStatement(expression=MethodInvocation(name='println', arguments=[Literal(value='"Hello, World"')], type_arguments=[], target=Name(value='System.out')))], abstract=False, extended_dims=0, throws=None)], modifiers=['public'], type_parameters=[], extends=None, implements=[])])
+
+This evaluates each line as it parses through and gives us enough information about the code from where we can extract the relevant information.
+
+
+We can also use plyj to analyse expressions like this:
+
+tree = parser.parse_expression('2*4')
+
+This gives the following output:
+
+
+Multiplicative(operator='*', lhs=Literal(value='2'), rhs=Literal(value='4'))
+
+
+
+Part B: JavaLang
+
+JavaLang  is a parser and lexer targeting Java 8. It is similar to plyj for parsing Java files and converting them into compilation units. Along with that one can even tokenize the string in that using this library. 
+
+Let us consider the tokenizing part of it:
+
+If we have the statement:
+System.out.println("Hello " + "world");
+And we want to tokenize it we get the following output:
+
+[Identifier "System" line 1, position 1, Separator "." line 1, position 7, Identifier "out" line 1, position 8, Separator "." line 1, position 11, Identifier "println" line 1, position 12, Separator "(" line 1, position 19, String ""Hello "" line 1, position 20, Operator "+" line 1, position 29, String ""world"" line 1, position 31, Separator ")" line 1, position 38, Separator ";" line 1, position 39]
+
+
+This gives the following things:
+Type of token
+The token 
+The line number of the token
+The position of the first occurence of the token
+
+Also similar to plyj it generates the compilation units:
+
+Example: Compilation unit of the statement just like the previous one is given as:
+
+MethodInvocation(arguments=[BinaryOperation(operandl=Literal(postfix_operators=[], prefix_operators=[], qualifier=None, selectors=[], value="Hello "), operandr=Literal(postfix_operators=[], prefix_operators=[], qualifier=None, selectors=[], value="world"), operator=+)], member=println, postfix_operators=[], prefix_operators=[], qualifier=System.out, selectors=[], type_arguments=None)
+
+
+
+
+
+
+Part C: JavaParser
+
+JavaParser is a set of tools to
+
+
+JavaParser is used to parse Java Code into AST(Abstract Syntax Tree) that represents  and unparse it also if required.
+
+Consider the following example:
+public void start(BundleContext context) throws Exception 
+{
+ 	super.start(context);
+ } 
+
+When we parse in JavaParser using this we get the following output:
+
+INPUT: 												OUTPUT:
+public void											Super Method Invocation, 
+start (BundleContext context) 						Public Method Declaration,
+throws Exception { 									Exception,
+	super.start(context); 							Formal Method Parameter,
+}    												Single Variable Declaration,
+													Void
+
+
+After building the tree using Eclipse AST API, the parser performs a semantic analyzed
+using the information in each node.
