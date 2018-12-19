@@ -91,3 +91,63 @@ throws Exception { 							Exception,
 
 After building the tree using Eclipse AST API, the parser performs a semantic analyzed
 using the information in each node.
+
+Let us see all the steps of the JavaParser:
+1. Abstract Syntax tree:
+
+Typically in an AST whitespace and comment tokens are omitted,as are parenthesis. However since comments are very useful in Java , the JavaParser library will record comment information and include it in the tree representation.
+
+Similarly like the plyj and JavaLang in python, the root of the AST is a compilation unit. It is the Java representation of source code from a complete and syntactically correct class file you have parsed.
+
+2. Classes used for traversla of the tree:
+
+It is a good idea to define a class to traverse the AST and operate on the concepts within the code one is interested in. 
+There are two reasons for this:
+1. Traversing the AST in the CompilationUnit tends to be laborious and error prone.
+2. It is recursive and makes use of frequent type checking to achieve the goal.
+
+
+Using JavaParser for code generationa and transformation:	
+JavaParser can do this by calling the toString() method for the compilationUnit generated for the AST generated.
+
+Using JavaParser for symbols and refereneces:
+
+Mostly the AST is useful for parsing our code. But there are instances in Java where we need to examine the nature betweern the nodes generated in the AST.
+
+Consider the follwing example:
+
+void foo()
+{
+	int a;
+	a=a+1;
+}
+
+In this we know that a=a+1 is an assignment operator. However we do not know the fact that what is the type of a. a can be a int in which case the result of a=a+1 will also generate an integer. However if a is a string then this means that a=a+1 is a concatenation. This type of reference information is not available in the AST.
+
+To solve this problem I have made use of the JavaSymbolSolver(bundles with the JavaParser library) to solve references between elements of a JavaParser AST.
+Eg. In Maven
+<dependency> 
+<groupId>com.github.javaparser</groupId> 
+<artifactId>javaparser-symbol-solver-core</artifactId> 
+<version>3.5.20</version> 
+</dependency>
+
+Let us see one more example:
+
+class RefCheck
+{
+	private String a;
+
+	void afunc()
+	{
+		while(true){
+			int a=0;
+			a=a+1;
+		}
+
+	}
+		}
+}
+
+
+
